@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScanResult, RiskLevel } from '../types/scanTypes';
+import { ScanResult } from '../types/scanTypes';
 import SSLDetails from './SSLDetails';
 import DomainAge from './DomainAge';
 import GeoLocation from './GeoLocation';
@@ -10,65 +10,76 @@ interface ResultCardProps {
   result: ScanResult;
 }
 
-function ResultCard({ result }: ResultCardProps) {
+export default function ResultCard({ result }: ResultCardProps) {
   const { url, ssl, domain, geolocation, riskLevel } = result;
-  
-  // Format the domain URL for display
+
   const formatUrlForDisplay = (urlString: string) => {
     try {
-      const parsedUrl = new URL(urlString);
-      return parsedUrl.hostname;
-    } catch (error) {
+      const parsed = new URL(urlString);
+      return parsed.hostname;
+    } catch {
       return urlString;
     }
   };
 
   return (
-    <div className="animate-in fade-in-50 duration-300 bg-card border border-border rounded-lg shadow-sm overflow-hidden">
-      <div className="p-4 border-b border-border flex items-center justify-between gap-2">
+    <div className="bg-gray-900/30 backdrop-blur-md rounded-3xl shadow-3xl overflow-hidden transform hover:scale-[1.005] transition-all duration-300">
+      {/* Header */}
+      <div className="flex items-center justify-between p-5 border-b border-gray-700">
         <div className="flex-1 overflow-hidden">
-          <h3 className="font-semibold truncate">{formatUrlForDisplay(url)}</h3>
-          <a 
-            href={url.startsWith('http') ? url : `https://${url}`} 
-            target="_blank" 
+          <h3 className="text-xl font-bold text-white truncate">
+            {formatUrlForDisplay(url)}
+          </h3>
+          <a
+            href={url.startsWith('http') ? url : `https://${url}`}
+            target="_blank"
             rel="noopener noreferrer"
-            className="text-sm text-primary flex items-center gap-1 hover:underline"
+            className="mt-1 inline-flex items-center text-sm text-cyan-300 hover:underline"
           >
             <span className="truncate">Visit site</span>
-            <ExternalLink className="h-3 w-3" />
+            <ExternalLink className="h-4 w-4 ml-1" />
           </a>
         </div>
         <RiskIndicator level={riskLevel} />
       </div>
-      
-      <div className="p-4 space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <SSLDetails ssl={ssl} />
-          <DomainAge domain={domain} />
-          <GeoLocation geolocation={geolocation} />
+
+      {/* Details Grid */}
+      <div className="p-5 space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="bg-gray-800/40 backdrop-blur-sm p-4 rounded-2xl shadow-inner">
+            <SSLDetails ssl={ssl} />
+          </div>
+          <div className="bg-gray-800/40 backdrop-blur-sm p-4 rounded-2xl shadow-inner">
+            <DomainAge domain={domain} />
+          </div>
+          <div className="bg-gray-800/40 backdrop-blur-sm p-4 rounded-2xl shadow-inner">
+            <GeoLocation geolocation={geolocation} />
+          </div>
         </div>
-        
-        <div className="bg-muted rounded-md p-3 text-sm">
-          <div className="font-medium mb-1">Risk Assessment</div>
-          <p className="text-muted-foreground">
-            {riskLevel === 'high' && 'This URL shows multiple high-risk indicators. Proceed with extreme caution.'}
-            {riskLevel === 'medium' && 'This URL has some concerning indicators. Use caution when proceeding.'}
-            {riskLevel === 'low' && 'This URL appears to be safe, but always be cautious when following links.'}
+
+        <div className="bg-gray-800/20 backdrop-blur-sm p-4 rounded-2xl shadow-inner">
+          <div className="font-semibold text-white mb-2">Risk Assessment</div>
+          <p className="text-gray-300 text-sm">
+            {riskLevel === 'high' && '⚠️ Multiple high-risk indicators. Proceed with extreme caution.'}
+            {riskLevel === 'medium' && '⚠️ Some concerning indicators. Use caution.'}
+            {riskLevel === 'low' && '✅ Appears safe, but always be cautious.'}
           </p>
         </div>
       </div>
-      
-      <div className="px-4 py-3 bg-muted/50 border-t border-border flex justify-between">
-        <button className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1">
-          <RefreshCw className="h-3 w-3" />
+
+      {/* Footer Actions */}
+      <div className="flex items-center justify-between p-4 bg-gray-900/40 border-t border-gray-700">
+        <button
+          onClick={() => window.location.reload()}
+          className="inline-flex items-center gap-2 text-sm text-gray-300 hover:text-white"
+        >
+          <RefreshCw className="h-4 w-4" />
           <span>Rescan</span>
         </button>
-        <span className="text-xs text-muted-foreground">
-          Scanned {new Date().toLocaleTimeString()}
+        <span className="text-xs text-gray-400">
+          Scanned at {new Date().toLocaleTimeString()}
         </span>
       </div>
     </div>
   );
 }
-
-export default ResultCard;

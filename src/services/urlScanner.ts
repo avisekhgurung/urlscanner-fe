@@ -13,7 +13,7 @@ export async function scanUrl(url: string): Promise<ScanResult> {
   
   try {
     const response = await fetch(
-      `http://localhost:8000/api/url-info?url=${encodeURIComponent(validatedUrl)}`
+      `https://urlscanner-be.onrender.com/api/url-info?url=${encodeURIComponent(validatedUrl)}`
     );
     
     if (!response.ok) throw new Error('Failed to fetch URL info');
